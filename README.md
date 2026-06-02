@@ -1,6 +1,6 @@
-# Fitness | दर्जी — Personal Health Engine
+# FitnessBaba — Personal Health Engine
 
-> दर्जी means **tailor** in Hindi. Everything is personalised to you.
+> Everything is personalized to you.
 
 A single-page health & fitness app with AI-powered meal plans, workout programmes, body scan analysis, skin care routines, and a full coaching chat — all running in the browser with no backend except a thin Vercel proxy.
 
@@ -9,7 +9,7 @@ A single-page health & fitness app with AI-powered meal plans, workout programme
 ## Project Structure
 
 ```
-fitnessdarji/
+fitnessbaba/
 ├── index.html          # HTML shell — links CSS + JS, no logic here
 ├── css/
 │   └── styles.css      # All styling (biopunk dark theme)
