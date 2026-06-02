@@ -54,7 +54,7 @@ function activateAll() {
     Object.keys(S.enabled).forEach(k=>S.enabled[k]=true);
     startRemLoop(); startWater();
     tabAlerts(); // re-render to show checked state
-    showNotif('All reminders active! 🚀','दर्जी is watching');
+    showNotif('All reminders active! 🚀','FitnessBaba is watching');
   });
 }
 

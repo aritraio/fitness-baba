@@ -15,7 +15,7 @@ function tabCoach() {
         <div class="msg ai">
           <div>Namaste! 🙏 I'm your AI health coach, fully briefed on your profile.<br><br>
           <strong>${S.gender}, ${S.age}yo · ${S.weight}kg → ${S.targetWeight}kg · ${S.goalLabel}</strong><br><br>
-          Ask me anything — nutrition, workouts, motivation, science, or just a pep talk. मैं यहाँ हूँ!</div>
+          Ask me anything — nutrition, workouts, motivation, science, or just a pep talk. I'm here!</div>
           <div class="msg-t">${getTime()}</div>
         </div>
       </div>
@@ -52,12 +52,12 @@ async function sendChat() {
   chatHist.push({r:'user',c:msg});
 
   const m=macros();
-  const ctx=`You are दर्जी AI Coach, a warm, science-backed personal health coach.
+  const ctx=`You are FitnessBaba AI Coach, a warm, science-backed personal health coach.
 User profile: ${S.age}yo ${S.gender}, ${S.height}cm, ${S.weight}kg, Activity: ${S.activity}
 Goal: ${S.goalLabel} | Target: ${S.targetWeight}kg @ ${S.pace}kg/wk | Diet: ${S.diet}
 Daily calories: ${Math.round(daily())} kcal | Macros: P${m.protein}g C${m.carbs}g F${m.fat}g
 Pantry: ${S.pantry.length?S.pantry.join(', '):'not specified'}
-Respond warmly in <150 words unless deep explanation needed. Use occasional Hindi words for personality.
+Respond warmly in <150 words unless deep explanation needed.
 Recent conversation:
 ${chatHist.slice(-8).map(h=>`${h.r==='user'?'User':'Coach'}: ${h.c}`).join('\n')}
 User: ${msg}
