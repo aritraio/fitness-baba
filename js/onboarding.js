@@ -262,5 +262,5 @@ async function launch() {
   document.getElementById('dashboard').style.display='block';
   buildDashboard();
   await saveProfile();          /* persist onboarding data for next visit */
-  showNotif('Dashboard loaded — all systems go.','दर्जी Ready 🚀');
+  showNotif('Dashboard loaded — all systems go.','FitnessBaba Ready 🚀');
 }
