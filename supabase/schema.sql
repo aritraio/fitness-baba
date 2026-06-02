@@ -1,5 +1,5 @@
 -- ══════════════════════════════════════════════════════
--- Fitness | दर्जी  —  Supabase schema
+-- Fitness | FitnessBaba  —  Supabase schema
 -- Run this once in: Supabase dashboard → SQL Editor
 -- ══════════════════════════════════════════════════════
 
