@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness | दर्जी</title>
+
+  <!-- Clerk publishable key — replace with yours from dashboard.clerk.com -->
+  <meta name="clerk-pk" content="pk_test_Y29uY2lzZS1raXR0ZW4tNi5jbGVyay5hY2NvdW50cy5kZXYk">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Clerk browser SDK (loaded before body scripts) -->
+  <script src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js" type="text/javascript"></script>
+</head>
+<body>
+
+<!-- ── AUTH LOADING OVERLAY ────────────────────────────── -->
+<div id="auth-loader">
+  <div class="auth-loader-inner">
+    <div class="spinner"></div>
+    <div class="auth-loader-txt">Initialising…</div>
+  </div>
+</div>
+
+<!-- ── SIGN-IN PAGE ─────────────────────────────────────── -->
+<div id="auth-page" style="display:none">
+  <div class="auth-hero">
+    <div class="logo-tag" style="margin-bottom:8px">Personal Health Engine v3.0</div>
+    <h1 class="app-title" style="font-size:32px;margin-bottom:6px">
+      Fitness | <span class="hindi-title">दर्जी</span>
+    </h1>
+    <p class="tagline" style="margin-bottom:28px">
+      // आपका personal health coach — biomarkers to kitchen in 60s
+    </p>
+    <div id="clerk-sign-in"></div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ──────────────────────────────────────────── -->
+<div id="app" style="display:none">
+
+  <!-- HEADER -->
+  <header id="hdr">
+    <div class="hdr-top">
+      <div>
+        <div class="logo-tag">Personal Health Engine v3.0</div>
+        <h1 class="app-title">Fitness | <span class="hindi-title">दर्जी</span></h1>
+        <p class="tagline">// आपका personal health coach — biomarkers to kitchen in 60s</p>
+      </div>
+      <!-- Clerk UserButton mounts here after sign-in -->
+      <div id="user-btn-slot"></div>
+    </div>
+    <div class="key-bar">
+      <div class="key-row">
+        <span class="key-icon">✦</span>
+        <span class="key-label">Model</span>
+        <select id="model-sel" onchange="setModel(this.value)" title="AI model via ZenMux">
+          <option value="openai/gpt-4o" selected>GPT-4o</option>
+          <option value="openai/gpt-4o-mini">GPT-4o mini</option>
+          <option value="anthropic/claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+          <option value="anthropic/claude-3-5-haiku-20241022">Claude 3.5 Haiku</option>
+          <option value="google/gemini-2.0-flash">Gemini 2.0 Flash</option>
+          <option value="google/gemini-1.5-pro">Gemini 1.5 Pro</option>
+        </select>
+        <span class="key-powered">via ZenMux</span>
+      </div>
+      <div class="key-hint">
+        94 models · OpenAI · Anthropic · Google ·
+        <a href="https://zenmux.ai/models" target="_blank" rel="noopener">zenmux.ai/models →</a>
+      </div>
+    </div>
+    <div class="progress-dots" id="dots"></div>
+  </header>
+
+  <!-- ONBOARDING -->
+  <div id="onboarding"></div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" style="display:none">
+    <div class="tab-bar" id="tab-bar"></div>
+    <div id="tab-content"></div>
+  </div>
+
+</div><!-- /#app -->
+
+<!-- TOASTS -->
+<div id="toasts"></div>
+
+<!-- CORS / FILE-PROTOCOL BANNER -->
+<div id="cors-banner" style="display:none">
+  <div class="cors-inner">
+    <div class="cors-title">⚠️ Open via localhost — not as a file</div>
+    <div class="cors-body">
+      Browsers block API calls from <code>file://</code> URLs (CORS null-origin).
+      Run a local server in the same folder, then open the URL it gives you:
+    </div>
+    <div class="cors-cmds">
+      <div class="cors-cmd" onclick="copyCmd(this)" data-cmd="npx vercel dev">
+        <span class="cors-lang">Vercel</span>
+        <code>npx vercel dev</code>
+        <span class="cors-copy">copy</span>
+      </div>
+      <div class="cors-cmd" onclick="copyCmd(this)" data-cmd="python3 -m http.server 8080">
+        <span class="cors-lang">Python 3</span>
+        <code>python3 -m http.server 8080</code>
+        <span class="cors-copy">copy</span>
+      </div>
+      <div class="cors-cmd" onclick="copyCmd(this)" data-cmd="npx serve .">
+        <span class="cors-lang">Node</span>
+        <code>npx serve .</code>
+        <span class="cors-copy">copy</span>
+      </div>
+    </div>
+    <div class="cors-body" style="margin-top:8px">
+      <strong style="color:var(--accent)">Recommended:</strong> use <code>npx vercel dev</code> —
+      it runs the API proxy and auth locally too.<br>
+      Then open <strong style="color:var(--accent)">http://localhost:3000</strong>
+    </div>
+    <button class="cors-dismiss" onclick="document.getElementById('cors-banner').style.display='none'">
+      Dismiss (API calls will fail)
+    </button>
+  </div>
+</div>
+
+<!-- ── Scripts — dependency order, global scope ── -->
+<script src="js/state.js"></script>
+<script src="js/calc.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/db.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/onboarding.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/overview.js"></script>
+<script src="js/timeline.js"></script>
+<script src="js/meals.js"></script>
+<script src="js/exercise.js"></script>
+<script src="js/bodyscan.js"></script>
+<script src="js/skincare.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/cheat.js"></script>
+<script src="js/coach.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
