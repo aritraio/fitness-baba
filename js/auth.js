@@ -103,7 +103,7 @@ async function onSignedIn() {
 
     if (saved) {
       Object.assign(S, saved);
-      showNotif('Welcome back! 👋', clerk.user.firstName || 'दर्जी');
+      showNotif('Welcome back! 👋', clerk.user.firstName || 'FitnessBaba');
       renderDots(STEPS + 1);
       document.getElementById('onboarding').style.display = 'none';
       document.getElementById('dashboard').style.display = 'block';
