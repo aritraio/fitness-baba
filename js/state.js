@@ -22,5 +22,7 @@ export const S = {
 };
 
 export const STEPS = 6;
-window.S = S;
-window.STEPS = STEPS;
+if (typeof window !== 'undefined') {
+  window.S = S;
+  window.STEPS = STEPS;
+}

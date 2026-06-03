@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run --environment jsdom"
   },
   "dependencies": {
     "@clerk/backend": "^1.22.0",
     "@supabase/supabase-js": "^2.47.0"
   },
   "devDependencies": {
+    "jsdom": "^29.1.1",
     "vitest": "^1.6.0"
   }
 }
