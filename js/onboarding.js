@@ -1,7 +1,12 @@
+import { S } from './state.js';
+import { goStep, showNotif, bindOpts } from './ui.js';
+import { saveProfile } from './db.js';
+import { timeline, daily, macros } from './calc.js';
+
 /* ══════════════════════════════════════════════════════
    STEP 1 — BIO STATS
 ══════════════════════════════════════════════════════ */
-function step1(ob) {
+export function step1(ob) {
   const c = document.createElement('div');
   c.className='card';
   c.innerHTML=`
@@ -33,7 +38,7 @@ function step1(ob) {
   bindOpts(c.querySelector('#g-gender'));
   bindOpts(c.querySelector('#g-act'));
 }
-function sub1() {
+export function sub1() {
   const age=+document.getElementById('a-age').value;
   const ht=+document.getElementById('a-ht').value;
   const wt=+document.getElementById('a-wt').value;
@@ -48,7 +53,7 @@ function sub1() {
 /* ══════════════════════════════════════════════════════
    STEP 2 — GOAL
 ══════════════════════════════════════════════════════ */
-function step2(ob) {
+export function step2(ob) {
   const t = Math.round(tdee());
   const c = document.createElement('div');
   c.className='card';
@@ -70,7 +75,7 @@ function step2(ob) {
   ob.appendChild(c);
   bindOpts(c.querySelector('#g-goal'));
 }
-function sub2() {
+export function sub2() {
   const o=document.querySelector('#g-goal .opt.selected');
   if(!o){showNotif('Select a goal','Missing Info');return;}
   S.goal=+o.dataset.v; S.goalLabel=o.dataset.l; goStep(3);
@@ -79,7 +84,7 @@ function sub2() {
 /* ══════════════════════════════════════════════════════
    STEP 3 — WEIGHT TARGET
 ══════════════════════════════════════════════════════ */
-function step3(ob) {
+export function step3(ob) {
   const c = document.createElement('div');
   c.className='card';
   c.innerHTML=`
@@ -90,7 +95,7 @@ function step3(ob) {
       <input type="number" id="a-tw" value="${S.targetWeight||''}" placeholder="${S.weight}" min="30" max="300" oninput="updTL()"></div>
     <div class="field">
       <div class="range-row"><span>Pace</span><span class="range-val" id="pv">${S.pace} kg/week</span></div>
-      <input type="range" min=".25" max="1" step=".25" value="${S.pace}"
+      <input type="range" min=".25" max="1" S.step = ".25" value="${S.pace}"
         oninput="document.getElementById('pv').textContent=this.value+' kg/week';S.pace=+this.value;updTL()">
       <div class="range-hints"><span>.25 kg/wk</span><span>1.0 kg/wk</span></div>
     </div>
@@ -107,7 +112,7 @@ function step3(ob) {
   ob.appendChild(c);
   if(S.targetWeight) updTL();
 }
-function updTL() {
+export function updTL() {
   const t=+document.getElementById('a-tw').value;
   if(!t) return;
   S.targetWeight=t;
@@ -116,7 +121,7 @@ function updTL() {
   document.getElementById('tl-w').textContent=`${tl.weeks} weeks (${tl.months} months)`;
   document.getElementById('tl-d').textContent=tl.end.toLocaleDateString('en-IN',{year:'numeric',month:'short',day:'numeric'});
 }
-function sub3() {
+export function sub3() {
   if(!S.targetWeight||S.targetWeight<=0){showNotif('Enter a valid target weight','Missing Info');return;}
   goStep(4);
 }
@@ -124,7 +129,7 @@ function sub3() {
 /* ══════════════════════════════════════════════════════
    STEP 4 — DIET & PANTRY
 ══════════════════════════════════════════════════════ */
-function step4(ob) {
+export function step4(ob) {
   const c = document.createElement('div');
   c.className='card';
   c.innerHTML=`
@@ -151,17 +156,17 @@ function step4(ob) {
   bindOpts(c.querySelector('#g-diet'));
   renderChips();
 }
-function addChip(e) {
+export function addChip(e) {
   if(e.key!=='Enter') return; e.preventDefault();
   const inp=document.getElementById('ci');
   const v=inp.value.trim();
   if(!v||S.pantry.length>=5||S.pantry.includes(v)) return;
   S.pantry.push(v); inp.value=''; renderChips();
 }
-function rmChip(v) {
+export function rmChip(v) {
   S.pantry=S.pantry.filter(p=>p!==v); renderChips();
 }
-function renderChips() {
+export function renderChips() {
   const wrap=document.getElementById('chips');
   const inp=document.getElementById('ci');
   if(!wrap||!inp) return;
@@ -175,7 +180,7 @@ function renderChips() {
   const cc=document.getElementById('chip-count');
   if(cc) cc.textContent=`${S.pantry.length}/5 ingredients`;
 }
-function sub4() {
+export function sub4() {
   const o=document.querySelector('#g-diet .opt.selected');
   if(!o){showNotif('Select a diet preference','Missing Info');return;}
   S.diet=o.dataset.v; goStep(5);
@@ -184,7 +189,7 @@ function sub4() {
 /* ══════════════════════════════════════════════════════
    STEP 5 — REMINDERS
 ══════════════════════════════════════════════════════ */
-function step5(ob) {
+export function step5(ob) {
   const c = document.createElement('div');
   c.className='card';
   c.innerHTML=`
@@ -197,13 +202,13 @@ function step5(ob) {
     <div class="field"><label>Workout Time</label><input type="time" id="r-wo" value="${S.reminders.workout}"></div>
     <div class="field">
       <div class="range-row"><span>Workout Days / Week</span><span class="range-val" id="wdv">${S.reminders.workoutDays} days</span></div>
-      <input type="range" min="1" max="7" step="1" value="${S.reminders.workoutDays}"
+      <input type="range" min="1" max="7" S.step = "1" value="${S.reminders.workoutDays}"
         oninput="document.getElementById('wdv').textContent=this.value+' days';S.reminders.workoutDays=+this.value">
       <div class="range-hints"><span>1 day</span><span>7 days</span></div>
     </div>
     <div class="field">
       <div class="range-row"><span>Water Reminder Interval</span><span class="range-val" id="wiv">${S.reminders.waterInterval} min</span></div>
-      <input type="range" min="30" max="180" step="15" value="${S.reminders.waterInterval}"
+      <input type="range" min="30" max="180" S.step = "15" value="${S.reminders.waterInterval}"
         oninput="document.getElementById('wiv').textContent=this.value+' min';S.reminders.waterInterval=+this.value">
       <div class="range-hints"><span>30 min</span><span>3 hours</span></div>
     </div>
@@ -213,7 +218,7 @@ function step5(ob) {
     </div>`;
   ob.appendChild(c);
 }
-function sub5() {
+export function sub5() {
   S.reminders.breakfast=document.getElementById('r-bf').value;
   S.reminders.lunch=document.getElementById('r-ln').value;
   S.reminders.dinner=document.getElementById('r-dn').value;
@@ -224,7 +229,7 @@ function sub5() {
 /* ══════════════════════════════════════════════════════
    STEP 6 — LAUNCH
 ══════════════════════════════════════════════════════ */
-function step6(ob) {
+export function step6(ob) {
   const b=bmi().toFixed(1), bc=bmiCat(+b);
   const d=Math.round(daily()), br=Math.round(bmr()), td=Math.round(tdee());
   const tl=timeline();
@@ -256,7 +261,7 @@ function step6(ob) {
     </div>`;
   ob.appendChild(c);
 }
-async function launch() {
+export async function launch() {
   document.getElementById('onboarding').style.display='none';
   renderDots(STEPS+1);
   document.getElementById('dashboard').style.display='block';
@@ -264,3 +269,21 @@ async function launch() {
   await saveProfile();          /* persist onboarding data for next visit */
   showNotif('Dashboard loaded — all systems go.','FitnessBaba Ready 🚀');
 }
+
+/* Expose to window for inline HTML handlers */
+window.step1 = step1;
+window.sub1 = sub1;
+window.step2 = step2;
+window.sub2 = sub2;
+window.step3 = step3;
+window.updTL = updTL;
+window.sub3 = sub3;
+window.step4 = step4;
+window.addChip = addChip;
+window.rmChip = rmChip;
+window.renderChips = renderChips;
+window.sub4 = sub4;
+window.step5 = step5;
+window.sub5 = sub5;
+window.step6 = step6;
+window.launch = launch;

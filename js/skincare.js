@@ -1,7 +1,13 @@
+import { S } from './state.js';
+import { callVisionAPI, parseObj } from './api.js';
+import { sanitize, showNotif } from './ui.js';
+import { saveProfile } from './db.js';
+import { openCam, capCam, closeCam } from './camera.js';
+
 /* ══════════════════════════════════════════════════════
    TAB 6 — SKIN CARE
 ══════════════════════════════════════════════════════ */
-function tabSkinCare() {
+export function tabSkinCare() {
   const p=document.getElementById('p-skincare');
   if(p.dataset.built) return;
   p.dataset.built='1';
@@ -28,15 +34,15 @@ function tabSkinCare() {
     <div id="skin-out"></div>`;
 }
 
-function dropSkin(e) {
+export function dropSkin(e) {
   e.preventDefault();
   document.getElementById('skin-dz').classList.remove('over');
   readFile(e.dataTransfer.files[0],'skin');
 }
-function fileSkin(inp){ readFile(inp.files[0],'skin'); }
+export function fileSkin(inp){ readFile(inp.files[0],'skin'); }
 
-async function analyzeSkin() {
-  if(!skinB64){showNotif('Upload or capture a selfie first');return;}
+export async function analyzeSkin() {
+  if(!S.skinB64){showNotif('Upload or capture a selfie first');return;}
   const prompt=`Analyze this facial/skin photo and give a comprehensive skincare assessment.
 User: ${S.age}yo ${S.gender}, Diet: ${S.diet}
 Return ONLY valid JSON:
@@ -53,7 +59,7 @@ Return ONLY valid JSON:
   const out=document.getElementById('skin-out');
   out.innerHTML=`<div class="loader"><div class="spinner"></div><div class="loader-txt">ANALYZING YOUR SKIN...</div></div>`;
   try {
-    const raw=await callVisionAPI(prompt,skinB64);
+    const raw=await callVisionAPI(prompt,S.skinB64);
     const data=parseObj(raw);
     out.innerHTML=renderSkinResults(data);
   } catch(e) {
@@ -61,7 +67,7 @@ Return ONLY valid JSON:
   }
 }
 
-function renderSkinResults(d) {
+export function renderSkinResults(d) {
   const rings=buildRings([{score:d.skin_score||0,label:'Skin Score',color:'#a78bfa'}]);
   const concerns=(d.concerns||[]).map(c=>`
     <span class="concern-tag" style="background:${c.color}22;border:1px solid ${c.color}44;color:${c.color}">
@@ -100,3 +106,10 @@ function renderSkinResults(d) {
     ${d.avoid&&d.avoid.length?`<div class="res-card" style="border-color:rgba(255,77,109,.2)"><div class="res-title" style="color:var(--accent2)">⛔ Avoid</div>${d.avoid.map(a=>`<div class="proto-rule" style="color:var(--accent2)">✕ ${a}</div>`).join('')}</div>`:''}
     ${d.pro_tip?`<div class="pro-tip">${d.pro_tip}</div>`:''}`;
 }
+
+/* Expose to window for inline HTML handlers */
+window.tabSkinCare = tabSkinCare;
+window.dropSkin = dropSkin;
+window.fileSkin = fileSkin;
+window.analyzeSkin = analyzeSkin;
+window.renderSkinResults = renderSkinResults;

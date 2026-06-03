@@ -1,7 +1,11 @@
+import { S } from './state.js';
+import { fireN } from './ui.js';
+import { saveProfile } from './db.js';
+
 /* ══════════════════════════════════════════════════════
    TAB 7 — ALERTS
 ══════════════════════════════════════════════════════ */
-function tabAlerts() {
+export function tabAlerts() {
   const p=document.getElementById('p-alerts');
   const items=[
     {k:'breakfast',icon:'🌅',name:'Breakfast',time:S.reminders.breakfast},
@@ -32,24 +36,24 @@ function tabAlerts() {
     <button class="btn" onclick="activateAll()">🔔 Activate All Reminders</button>`;
 }
 
-function togRem(key, on) {
+export function togRem(key, on) {
   S.enabled[key]=on;
   if(on){
     if(key==='water') startWater();
-    else if(!remLoop) startRemLoop();
+    else if(!S.remLoop) startRemLoop();
     showNotif(`${key} reminder enabled`,'Reminder Set');
   } else {
     if(key==='water') stopWater();
   }
 }
 
-async function reqNotif() {
+export async function reqNotif() {
   if(Notification.permission==='granted'){showNotif('Notifications already enabled!');return;}
   const p=await Notification.requestPermission();
   p==='granted'?showNotif('Notifications enabled! 🔔','Permission Granted'):showNotif('Enable notifications in browser settings','Blocked');
 }
 
-function activateAll() {
+export function activateAll() {
   reqNotif().then(()=>{
     Object.keys(S.enabled).forEach(k=>S.enabled[k]=true);
     startRemLoop(); startWater();
@@ -58,9 +62,9 @@ function activateAll() {
   });
 }
 
-function startRemLoop() {
-  if(remLoop) clearInterval(remLoop);
-  remLoop=setInterval(()=>{
+export function startRemLoop() {
+  if(S.remLoop) clearInterval(S.remLoop);
+  S.remLoop=setInterval(()=>{
     const now=new Date();
     const hm=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     if(S.enabled.breakfast&&hm===S.reminders.breakfast) fireN('🌅 Breakfast','Time for breakfast! Keep those macros in check.');
@@ -70,10 +74,19 @@ function startRemLoop() {
   },60000);
 }
 
-function startWater() {
-  if(waterLoop) clearInterval(waterLoop);
-  waterLoop=setInterval(()=>{
+export function startWater() {
+  if(S.waterLoop) clearInterval(S.waterLoop);
+  S.waterLoop=setInterval(()=>{
     if(S.enabled.water) fireN('💧 Hydrate','Drink a glass of water — stay at peak performance!');
   }, S.reminders.waterInterval*60000);
 }
-function stopWater(){ if(waterLoop){clearInterval(waterLoop);waterLoop=null;} }
+export function stopWater(){ if(S.waterLoop){clearInterval(S.waterLoop);S.waterLoop=null;} }
+
+/* Expose to window for inline HTML handlers */
+window.tabAlerts = tabAlerts;
+window.togRem = togRem;
+window.reqNotif = reqNotif;
+window.activateAll = activateAll;
+window.startRemLoop = startRemLoop;
+window.startWater = startWater;
+window.stopWater = stopWater;

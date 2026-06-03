@@ -1,9 +1,13 @@
+import { S } from './state.js';
+import { getAuthToken } from './auth.js';
+import { sanitize, showNotif } from './ui.js';
+
 /* ══════════════════════════════════════════════════════
    TAB — PROGRESS TRACKER (Chart.js + Logs API)
    ══════════════════════════════════════════════════════ */
 let weightChart = null;
 
-async function tabProgress() {
+export async function tabProgress() {
   const p = document.getElementById('p-progress');
   if (!p) return;
 
@@ -18,7 +22,7 @@ async function tabProgress() {
         <div class="stats-grid">
           <div class="field" style="margin-bottom:0">
             <label for="log-weight">Weight (kg)</label>
-            <input type="number" id="log-weight" step="0.1" placeholder="e.g. 72.5" min="20" max="300">
+            <input type="number" id="log-weight" S.step = "0.1" placeholder="e.g. 72.5" min="20" max="300">
           </div>
           <div class="field" style="margin-bottom:0">
             <label for="log-calories">Calories (kcal)</label>
@@ -28,7 +32,7 @@ async function tabProgress() {
         <div class="stats-grid" style="margin-top:10px">
           <div class="field" style="margin-bottom:0">
             <label for="log-water">Water Intake (ml)</label>
-            <input type="number" id="log-water" placeholder="e.g. 2500" min="0" max="20000" step="100">
+            <input type="number" id="log-water" placeholder="e.g. 2500" min="0" max="20000" S.step = "100">
           </div>
           <div class="field" style="margin-bottom:0">
             <label for="log-date">Date</label>
@@ -73,7 +77,7 @@ async function tabProgress() {
   await refreshLogs();
 }
 
-async function loadDailyLogs() {
+export async function loadDailyLogs() {
   const token = await getAuthToken();
   if (!token) {
     throw new Error('Not signed in');
@@ -90,7 +94,7 @@ async function loadDailyLogs() {
   return await res.json();
 }
 
-async function refreshLogs() {
+export async function refreshLogs() {
   const historyDiv = document.getElementById('logs-history');
   try {
     const logs = await loadDailyLogs();
@@ -115,7 +119,7 @@ async function refreshLogs() {
   }
 }
 
-async function saveDailyLog(event) {
+export async function saveDailyLog(event) {
   event.preventDefault();
   const token = await getAuthToken();
   if (!token) {
@@ -157,7 +161,7 @@ async function saveDailyLog(event) {
   }
 }
 
-function renderLogsChart(logs) {
+export function renderLogsChart(logs) {
   const ctx = document.getElementById('weightChart');
   if (!ctx) return;
 
@@ -219,7 +223,7 @@ function renderLogsChart(logs) {
   });
 }
 
-function renderLogsHistory(logs) {
+export function renderLogsHistory(logs) {
   const historyDiv = document.getElementById('logs-history');
   if (!historyDiv) return;
 
@@ -245,3 +249,11 @@ function renderLogsHistory(logs) {
     `;
   }).join('');
 }
+
+/* Expose to window for inline HTML handlers */
+window.tabProgress = tabProgress;
+window.loadDailyLogs = loadDailyLogs;
+window.refreshLogs = refreshLogs;
+window.saveDailyLog = saveDailyLog;
+window.renderLogsChart = renderLogsChart;
+window.renderLogsHistory = renderLogsHistory;

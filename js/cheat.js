@@ -1,7 +1,13 @@
+import { S } from './state.js';
+import { callAPI, parseObj } from './api.js';
+import { daily, macros } from './calc.js';
+import { sanitize, showNotif } from './ui.js';
+import { saveProfile } from './db.js';
+
 /* ══════════════════════════════════════════════════════
    TAB 8 — CHEAT MEAL
 ══════════════════════════════════════════════════════ */
-function tabCheat() {
+export function tabCheat() {
   const p=document.getElementById('p-cheat');
   if(p.dataset.built) return;
   p.dataset.built='1';
@@ -18,7 +24,7 @@ function tabCheat() {
     <div id="cheat-out"></div>`;
 }
 
-async function genCheat() {
+export async function genCheat() {
   const prompt=`You are a nutrition coach who believes in sustainable dieting. Plan a strategic cheat meal.
 User: ${S.age}yo, ${S.weight}kg, Goal: ${S.goalLabel}, Diet: ${S.diet}, Daily target: ${Math.round(daily())} kcal
 Return ONLY valid JSON:
@@ -55,3 +61,7 @@ Return ONLY valid JSON:
     out.innerHTML=`<div class="err-card"><p>⚠️ Could not plan cheat meal. Check your OpenAI API key in the header.<br><br><small>${e.message}</small></p><button class="btn btn-red btn-sm" onclick="genCheat()">Retry</button></div>`;
   }
 }
+
+/* Expose to window for inline HTML handlers */
+window.tabCheat = tabCheat;
+window.genCheat = genCheat;

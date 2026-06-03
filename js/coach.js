@@ -1,7 +1,12 @@
+import { S } from './state.js';
+import { callAPIStream } from './api.js';
+import { macros, daily } from './calc.js';
+import { sanitize } from './ui.js';
+
 /* ══════════════════════════════════════════════════════
    TAB 9 — AI COACH
 ══════════════════════════════════════════════════════ */
-function tabCoach() {
+export function tabCoach() {
   const p=document.getElementById('p-coach');
   if(p.dataset.built) return;
   p.dataset.built='1';
@@ -27,11 +32,11 @@ function tabCoach() {
     </div>`;
 }
 
-function getTime(){ return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+export function getTime(){ return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
 
-function chatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
+export function chatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
 
-async function sendChat() {
+export async function sendChat() {
   const inp=document.getElementById('chat-inp');
   const msg=inp.value.trim();
   if(!msg) return;
@@ -49,7 +54,7 @@ async function sendChat() {
   msgs.appendChild(typing);
   msgs.scrollTop=msgs.scrollHeight;
 
-  chatHist.push({r:'user',c:msg});
+  S.chatHist.push({r:'user',c:msg});
 
   const m=macros();
   const ctx=`You are FitnessBaba AI Coach, a warm, science-backed personal health coach.
@@ -59,7 +64,7 @@ Daily calories: ${Math.round(daily())} kcal | Macros: P${m.protein}g C${m.carbs}
 Pantry: ${S.pantry.length?S.pantry.join(', '):'not specified'}
 Respond warmly in <150 words unless deep explanation needed.
 Recent conversation:
-${chatHist.slice(-8).map(h=>`${h.r==='user'?'User':'Coach'}: ${h.c}`).join('\n')}
+${S.chatHist.slice(-8).map(h=>`${h.r==='user'?'User':'Coach'}: ${h.c}`).join('\n')}
 User: ${msg}
 Coach:`;
 
@@ -86,7 +91,7 @@ Coach:`;
         msgs.scrollTop = msgs.scrollHeight;
       },
       () => {
-        chatHist.push({r:'ai',c:fullResponse});
+        S.chatHist.push({r:'ai',c:fullResponse});
       },
       (e) => {
         console.error('[coach] stream error:', e);
@@ -99,3 +104,9 @@ Coach:`;
   }
   msgs.scrollTop=msgs.scrollHeight;
 }
+
+/* Expose to window for inline HTML handlers */
+window.tabCoach = tabCoach;
+window.getTime = getTime;
+window.chatKey = chatKey;
+window.sendChat = sendChat;

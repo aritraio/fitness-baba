@@ -1,7 +1,13 @@
+import { S } from './state.js';
+import { callVisionAPI, parseObj } from './api.js';
+import { sanitize, showNotif } from './ui.js';
+import { saveProfile } from './db.js';
+import { openCam, capCam, closeCam } from './camera.js';
+
 /* ══════════════════════════════════════════════════════
    TAB 5 — BODY SCAN
 ══════════════════════════════════════════════════════ */
-function tabBodyScan() {
+export function tabBodyScan() {
   const p=document.getElementById('p-bodyscan');
   if(p.dataset.built) return;
   p.dataset.built='1';
@@ -28,15 +34,15 @@ function tabBodyScan() {
     <div id="body-out"></div>`;
 }
 
-function dropBody(e) {
+export function dropBody(e) {
   e.preventDefault();
   document.getElementById('body-dz').classList.remove('over');
   readFile(e.dataTransfer.files[0],'body');
 }
-function fileBody(inp){ readFile(inp.files[0],'body'); }
+export function fileBody(inp){ readFile(inp.files[0],'body'); }
 
-async function analyzeBody() {
-  if(!bodyB64){showNotif('Upload or capture a photo first');return;}
+export async function analyzeBody() {
+  if(!S.bodyB64){showNotif('Upload or capture a photo first');return;}
   const prompt=`Analyze this full-body photo for fitness and body composition.
 User: ${S.age}yo ${S.gender}, ${S.weight}kg, ${S.height}cm, Goal: ${S.goalLabel}
 Return ONLY valid JSON (no other text):
@@ -51,7 +57,7 @@ Return ONLY valid JSON (no other text):
   const out=document.getElementById('body-out');
   out.innerHTML=`<div class="loader"><div class="spinner"></div><div class="loader-txt">SCANNING YOUR BODY...</div></div>`;
   try {
-    const raw=await callVisionAPI(prompt,bodyB64);
+    const raw=await callVisionAPI(prompt,S.bodyB64);
     const data=parseObj(raw);
     out.innerHTML=renderBodyResults(data);
     setTimeout(()=>animBars('m-fill'),120);
@@ -60,7 +66,7 @@ Return ONLY valid JSON (no other text):
   }
 }
 
-function renderBodyResults(d) {
+export function renderBodyResults(d) {
   const rings=buildRings([
     {score:d.overall_score||0,label:'Overall',color:'#00e5c0'},
     {score:d.posture_score||0,label:'Posture',color:'#a78bfa'}
@@ -98,3 +104,10 @@ function renderBodyResults(d) {
     ${d.weekly_focus?`<div class="weekly-focus">🎯 ${d.weekly_focus}</div>`:''}
     ${d.pro_tip?`<div class="pro-tip">${d.pro_tip}</div>`:''}`;
 }
+
+/* Expose to window for inline HTML handlers */
+window.tabBodyScan = tabBodyScan;
+window.dropBody = dropBody;
+window.fileBody = fileBody;
+window.analyzeBody = analyzeBody;
+window.renderBodyResults = renderBodyResults;

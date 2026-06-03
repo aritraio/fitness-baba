@@ -1,7 +1,10 @@
+import { S, STEPS } from './state.js';
+import { step1, step2, step3, step4, step5, step6 } from './onboarding.js';
+
 /* ══════════════════════════════════════════════════════
    TOASTS
 ══════════════════════════════════════════════════════ */
-function showNotif(msg, title='') {
+export function showNotif(msg, title='') {
   const c = document.getElementById('toasts');
   const t = document.createElement('div');
   t.className = 'toast';
@@ -10,7 +13,7 @@ function showNotif(msg, title='') {
   setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(110%)'; t.style.transition='all .3s'; setTimeout(()=>t.remove(),320); }, 3500);
 }
 
-function fireN(title, body) {
+export function fireN(title, body) {
   if(Notification.permission==='granted') new Notification(title,{body,icon:'💪'});
   showNotif(body, title);
 }
@@ -18,7 +21,7 @@ function fireN(title, body) {
 /* ══════════════════════════════════════════════════════
    PROGRESS DOTS
 ══════════════════════════════════════════════════════ */
-function renderDots(cur) {
+export function renderDots(cur) {
   const c = document.getElementById('dots');
   c.style.display = cur > STEPS ? 'none' : 'flex';
   c.innerHTML = '';
@@ -32,7 +35,7 @@ function renderDots(cur) {
 /* ══════════════════════════════════════════════════════
    OPT SELECT HELPER
 ══════════════════════════════════════════════════════ */
-function bindOpts(wrap) {
+export function bindOpts(wrap) {
   wrap.querySelectorAll('.opt').forEach(o=>{
     o.addEventListener('click',()=>{
       wrap.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected'));
@@ -44,8 +47,8 @@ function bindOpts(wrap) {
 /* ══════════════════════════════════════════════════════
    ONBOARDING ROUTER
 ══════════════════════════════════════════════════════ */
-function goStep(n) {
-  step = n;
+export function goStep(n) {
+  S.step = n;
   renderDots(n);
   const ob = document.getElementById('onboarding');
   ob.innerHTML='';
@@ -61,7 +64,7 @@ function goStep(n) {
 /* ══════════════════════════════════════════════════════
    SCORE RING BUILDER
 ══════════════════════════════════════════════════════ */
-function buildRings(items) {
+export function buildRings(items) {
   return items.map(({score,label,color})=>{
     const r=30, circ=2*Math.PI*r;
     const offset=circ*(1-score/100);
@@ -78,7 +81,7 @@ function buildRings(items) {
   }).join('');
 }
 
-function animBars(cls) {
+export function animBars(cls) {
   document.querySelectorAll('.'+cls).forEach(el=>{
     const w=el.dataset.w||el.getAttribute('data-w');
     if(w) el.style.width=w+'%';
@@ -88,13 +91,13 @@ function animBars(cls) {
 /* ══════════════════════════════════════════════════════
    CORS / PROTOCOL CHECK
 ══════════════════════════════════════════════════════ */
-function checkProtocol() {
+export function checkProtocol() {
   if (window.location.protocol === 'file:') {
     document.getElementById('cors-banner').style.display = 'flex';
   }
 }
 
-function copyCmd(el) {
+export function copyCmd(el) {
   const cmd = el.dataset.cmd;
   navigator.clipboard.writeText(cmd).then(() => {
     const label = el.querySelector('.cors-copy');
@@ -113,7 +116,7 @@ function copyCmd(el) {
 /* ══════════════════════════════════════════════════════
    SANITIZATION (XSS PROTECTION)
    ══════════════════════════════════════════════════════ */
-function sanitize(html) {
+export function sanitize(html) {
   if (typeof window.DOMPurify !== 'undefined') {
     return window.DOMPurify.sanitize(html);
   }
@@ -126,3 +129,15 @@ function sanitize(html) {
     .replace(/'/g, '&#x27;');
 }
 
+
+/* Expose to window for inline HTML handlers */
+window.showNotif = showNotif;
+window.fireN = fireN;
+window.renderDots = renderDots;
+window.bindOpts = bindOpts;
+window.goStep = goStep;
+window.buildRings = buildRings;
+window.animBars = animBars;
+window.checkProtocol = checkProtocol;
+window.copyCmd = copyCmd;
+window.sanitize = sanitize;

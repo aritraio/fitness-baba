@@ -1,3 +1,5 @@
+import { showNotif } from './ui.js';
+
 /* ══════════════════════════════════════════════════════
    AI MODEL SELECTOR
    Key lives in ZENMUX_API_KEY env var on Vercel — never in the browser.
@@ -5,7 +7,7 @@
 ══════════════════════════════════════════════════════ */
 let AI_MODEL = 'openai/gpt-4o';
 
-function setModel(val) {
+export function setModel(val) {
   AI_MODEL = val;
   showNotif(`Model → ${val}`, 'ZenMux');
 }
@@ -13,7 +15,7 @@ function setModel(val) {
 /* ══════════════════════════════════════════════════════
    ERROR PARSER
 ══════════════════════════════════════════════════════ */
-async function parseAIError(res) {
+export async function parseAIError(res) {
   let body = {};
   try { body = await res.json(); } catch(_) {}
   const msg = body.error?.message || res.statusText || 'Unknown error';
@@ -36,7 +38,7 @@ async function parseAIError(res) {
    AI API — routed through /api/chat (Vercel → ZenMux)
    Same-origin call from browser → no CORS issue at all.
 ══════════════════════════════════════════════════════ */
-async function callAPI(prompt) {
+export async function callAPI(prompt) {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -52,7 +54,7 @@ async function callAPI(prompt) {
   return d.choices?.[0]?.message?.content ?? '';
 }
 
-async function callAPIStream(prompt, onChunk, onDone, onError) {
+export async function callAPIStream(prompt, onChunk, onDone, onError) {
   try {
     const res = await fetch('/api/chat', {
       method: 'POST',
@@ -103,7 +105,7 @@ async function callAPIStream(prompt, onChunk, onDone, onError) {
   }
 }
 
-async function callVisionAPI(prompt, b64) {
+export async function callVisionAPI(prompt, b64) {
   /* Vision needs a model that supports image input */
   const visionModel = AI_MODEL.includes('gpt-3.5')
     ? 'openai/gpt-4o'
@@ -133,11 +135,20 @@ async function callVisionAPI(prompt, b64) {
 /* ══════════════════════════════════════════════════════
    JSON HELPERS
 ══════════════════════════════════════════════════════ */
-function parseArr(raw) {
+export function parseArr(raw) {
   const s=raw.indexOf('['), e=raw.lastIndexOf(']');
   return JSON.parse(raw.slice(s,e+1));
 }
-function parseObj(raw) {
+export function parseObj(raw) {
   const s=raw.indexOf('{'), e=raw.lastIndexOf('}');
   return JSON.parse(raw.slice(s,e+1));
 }
+
+/* Expose to window for inline HTML handlers */
+window.setModel = setModel;
+window.parseAIError = parseAIError;
+window.callAPI = callAPI;
+window.callAPIStream = callAPIStream;
+window.callVisionAPI = callVisionAPI;
+window.parseArr = parseArr;
+window.parseObj = parseObj;

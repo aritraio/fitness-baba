@@ -1,7 +1,12 @@
+import { S } from './state.js';
+import { callAPI, parseArr } from './api.js';
+import { sanitize, showNotif } from './ui.js';
+import { saveProfile } from './db.js';
+
 /* ══════════════════════════════════════════════════════
    TAB 4 — EXERCISE
 ══════════════════════════════════════════════════════ */
-function tabExercise() {
+export function tabExercise() {
   const p=document.getElementById('p-exercise');
   if(p.dataset.built) return;
   p.dataset.built='1';
@@ -17,7 +22,7 @@ function tabExercise() {
     <div id="workout-out"></div>`;
 }
 
-async function genWorkout() {
+export async function genWorkout() {
   const prompt=`You are an expert personal trainer. Create a ${S.reminders.workoutDays}-day/week workout plan.
 User: ${S.age}yo ${S.gender}, ${S.weight}kg, Activity: ${S.activity}, Goal: ${S.goalLabel}
 Return ONLY a valid JSON array of ${S.reminders.workoutDays} day objects:
@@ -49,3 +54,7 @@ Include 4-6 exercises per day. Make it progressive and goal-appropriate.`;
     out.innerHTML=`<div class="err-card"><p>⚠️ Could not generate workout. Check your OpenAI API key in the header.<br><br><small>${e.message}</small></p><button class="btn btn-red btn-sm" onclick="genWorkout()">Retry</button></div>`;
   }
 }
+
+/* Expose to window for inline HTML handlers */
+window.tabExercise = tabExercise;
+window.genWorkout = genWorkout;

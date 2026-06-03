@@ -1,3 +1,8 @@
+import { S, STEPS } from './state.js';
+import { loadProfile } from './db.js';
+import { goStep, renderDots, showNotif } from './ui.js';
+import { buildDashboard } from './dashboard.js';
+
 /* ══════════════════════════════════════════════════════
    AUTH — Clerk (email + Google OAuth)
    Publishable key read from <meta name="clerk-pk">
@@ -37,7 +42,7 @@ const CLERK_APPEARANCE = {
 };
 
 /* ── entry point (called from main.js) ──────────────────── */
-async function initAuth() {
+export async function initAuth() {
   /* Safety net — if auth hangs for any reason, show app after 8s */
   const fallbackTimer = setTimeout(() => {
     console.warn('[auth] Timeout — showing app without auth');
@@ -85,14 +90,14 @@ async function initAuth() {
 }
 
 /* ── no-auth fallback ───────────────────────────────────── */
-function showAppNoAuth() {
+export function showAppNoAuth() {
   hideAuthLoader();
   showPage('app');
   goStep(1);
 }
 
 /* ── signed-in ──────────────────────────────────────────── */
-async function onSignedIn() {
+export async function onSignedIn() {
   showPage('app');
   mountUserButton();
   showAuthLoader('Loading your profile…');
@@ -119,7 +124,7 @@ async function onSignedIn() {
 }
 
 /* ── signed-out ─────────────────────────────────────────── */
-function onSignedOut() {
+export function onSignedOut() {
   /* Reset in-memory state for next sign-in */
   Object.assign(S, {
     age:null, gender:null, height:null, weight:null,
@@ -138,27 +143,27 @@ function onSignedOut() {
 }
 
 /* ── helpers ────────────────────────────────────────────── */
-function mountUserButton() {
+export function mountUserButton() {
   const slot = document.getElementById('user-btn-slot');
   if (slot && !slot.hasChildNodes() && clerk) {
     clerk.mountUserButton(slot, { appearance: CLERK_APPEARANCE });
   }
 }
 
-async function getAuthToken() {
+export async function getAuthToken() {
   if (!clerk?.session) return null;
   try { return await clerk.session.getToken(); }
   catch { return null; }
 }
 
-function showPage(id) {
+export function showPage(id) {
   ['app', 'auth-page'].forEach(p => {
     const el = document.getElementById(p);
     if (el) el.style.display = (p === id) ? 'block' : 'none';
   });
 }
 
-function showAuthLoader(msg = 'Initialising…') {
+export function showAuthLoader(msg = 'Initialising…') {
   const el = document.getElementById('auth-loader');
   if (!el) return;
   el.style.display = 'flex';
@@ -166,7 +171,18 @@ function showAuthLoader(msg = 'Initialising…') {
   if (t) t.textContent = msg;
 }
 
-function hideAuthLoader() {
+export function hideAuthLoader() {
   const el = document.getElementById('auth-loader');
   if (el) el.style.display = 'none';
 }
+
+/* Expose to window for inline HTML handlers */
+window.initAuth = initAuth;
+window.showAppNoAuth = showAppNoAuth;
+window.onSignedIn = onSignedIn;
+window.onSignedOut = onSignedOut;
+window.mountUserButton = mountUserButton;
+window.getAuthToken = getAuthToken;
+window.showPage = showPage;
+window.showAuthLoader = showAuthLoader;
+window.hideAuthLoader = hideAuthLoader;

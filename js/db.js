@@ -1,10 +1,13 @@
+import { S } from './state.js';
+import { getAuthToken } from './auth.js';
+
 /* ══════════════════════════════════════════════════════
    DB — profile persistence via /api/profile
    All Supabase access is server-side; browser only calls
    our own /api/profile endpoint with a Clerk JWT.
 ══════════════════════════════════════════════════════ */
 
-async function loadProfile() {
+export async function loadProfile() {
   const token = await getAuthToken();
   if (!token) return null;
 
@@ -19,7 +22,7 @@ async function loadProfile() {
   return d.state ?? null;
 }
 
-async function saveProfile() {
+export async function saveProfile() {
   const token = await getAuthToken();
   if (!token) return;   /* not signed in — silently skip */
 
@@ -37,3 +40,7 @@ async function saveProfile() {
     console.warn('[db] saveProfile:', e.message);
   }
 }
+
+/* Expose to window for inline HTML handlers */
+window.loadProfile = loadProfile;
+window.saveProfile = saveProfile;

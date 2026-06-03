@@ -1,7 +1,10 @@
+import { S } from './state.js';
+import { bmi, bmr, tdee, daily, macros, bmiCat } from './calc.js';
+
 /* ══════════════════════════════════════════════════════
    TAB 1 — OVERVIEW
 ══════════════════════════════════════════════════════ */
-function tabOverview() {
+export function tabOverview() {
   const p = document.getElementById('p-overview');
   const b=bmi(), bc=bmiCat(b);
   const d=Math.round(daily()), br=Math.round(bmr()), td=Math.round(tdee());
@@ -43,7 +46,7 @@ function tabOverview() {
   },120);
 }
 
-function buildGauge(b) {
+export function buildGauge(b) {
   const W=220,H=148,cx=110,cy=120,r=92;
   const bMin=10,bMax=40;
   const ang = a => a*Math.PI/180;
@@ -86,7 +89,7 @@ function buildGauge(b) {
   </svg>`;
 }
 
-function animNeedle(b) {
+export function animNeedle(b) {
   const bMin=10,bMax=40;
   const cl=Math.min(Math.max(b,bMin),bMax);
   const angDeg=180-((cl-bMin)/(bMax-bMin))*180;
@@ -97,3 +100,8 @@ function animNeedle(b) {
   needle.style.transition='transform 1.6s cubic-bezier(.34,1.56,.64,1)';
   setTimeout(()=>{ needle.style.transform=`rotate(${90-angDeg}deg)`; },250);
 }
+
+/* Expose to window for inline HTML handlers */
+window.tabOverview = tabOverview;
+window.buildGauge = buildGauge;
+window.animNeedle = animNeedle;

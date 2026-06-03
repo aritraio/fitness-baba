@@ -1,3 +1,14 @@
+import { tabOverview } from './overview.js';
+import { tabTimeline } from './timeline.js';
+import { tabMeals } from './meals.js';
+import { tabExercise } from './exercise.js';
+import { tabBodyScan } from './bodyscan.js';
+import { tabSkinCare } from './skincare.js';
+import { tabAlerts } from './alerts.js';
+import { tabCheat } from './cheat.js';
+import { tabCoach } from './coach.js';
+import { tabProgress } from './progress.js';
+
 /* ══════════════════════════════════════════════════════
    DASHBOARD BUILDER
 ══════════════════════════════════════════════════════ */
@@ -14,7 +25,7 @@ const TABS=[
   {id:'coach',    lbl:'🤖 AI Coach'},
 ];
 
-function buildDashboard() {
+export function buildDashboard() {
   document.getElementById('tab-bar').innerHTML=
     TABS.map((t,i)=>`<button class="tab-btn${i===0?' active':''}" onclick="switchTab('${t.id}',this)">${t.lbl}</button>`).join('');
   document.getElementById('tab-content').innerHTML=
@@ -22,7 +33,7 @@ function buildDashboard() {
   tabOverview();
 }
 
-function switchTab(id, btn) {
+export function switchTab(id, btn) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
@@ -32,3 +43,7 @@ function switchTab(id, btn) {
     bodyscan:tabBodyScan,skincare:tabSkinCare,alerts:tabAlerts,cheat:tabCheat,coach:tabCoach};
   if(fn[id]) fn[id]();
 }
+
+/* Expose to window for inline HTML handlers */
+window.buildDashboard = buildDashboard;
+window.switchTab = switchTab;

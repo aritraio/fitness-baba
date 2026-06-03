@@ -1,10 +1,9 @@
-/* ══════════════════════════════════════════════════════
-   INIT — entry point
-══════════════════════════════════════════════════════ */
-checkProtocol();
-initAuth();       /* auth.js — handles Clerk init, then goStep(1) or dashboard */
+import { checkProtocol } from './ui.js';
+import { initAuth } from './auth.js';
 
-// Register PWA Service Worker
+checkProtocol();
+initAuth();
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')

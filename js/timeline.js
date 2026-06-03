@@ -1,7 +1,10 @@
+import { S } from './state.js';
+import { timeline, daily, macros } from './calc.js';
+
 /* ══════════════════════════════════════════════════════
    TAB 2 — TIMELINE
 ══════════════════════════════════════════════════════ */
-function tabTimeline() {
+export function tabTimeline() {
   const p=document.getElementById('p-timeline');
   const tl=timeline();
   const diff=S.weight-S.targetWeight;
@@ -63,3 +66,6 @@ function tabTimeline() {
         <div class="proto-rule">Reassess every 4 weeks — adjust based on progress</div>`}
     </div>`;
 }
+
+/* Expose to window for inline HTML handlers */
+window.tabTimeline = tabTimeline;

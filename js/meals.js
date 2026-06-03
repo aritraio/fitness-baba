@@ -1,7 +1,12 @@
+import { S } from './state.js';
+import { callAPI, parseArr } from './api.js';
+import { sanitize, showNotif } from './ui.js';
+import { saveProfile } from './db.js';
+
 /* ══════════════════════════════════════════════════════
    TAB 3 — MEALS
 ══════════════════════════════════════════════════════ */
-function tabMeals() {
+export function tabMeals() {
   const p=document.getElementById('p-meals');
   if(p.dataset.built) return;
   p.dataset.built='1';
@@ -19,7 +24,7 @@ function tabMeals() {
     <div id="meals-out"></div>`;
 }
 
-async function genMeals() {
+export async function genMeals() {
   const d=Math.round(daily()), m=macros();
   const pantryStr=S.pantry.length?`Available pantry items: ${S.pantry.join(', ')}.`:'';
   const prompt=`You are a professional nutritionist. Create a personalized daily meal plan.
@@ -50,3 +55,7 @@ Make meals realistic and delicious. Total ~${d} kcal.`;
     out.innerHTML=`<div class="err-card"><p>⚠️ Could not generate meal plan. Check your OpenAI API key in the header.<br><br><small>${e.message}</small></p><button class="btn btn-red btn-sm" onclick="genMeals()">Retry</button></div>`;
   }
 }
+
+/* Expose to window for inline HTML handlers */
+window.tabMeals = tabMeals;
+window.genMeals = genMeals;
