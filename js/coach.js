@@ -40,7 +40,7 @@ async function sendChat() {
   const msgs=document.getElementById('chat-msgs');
   const um=document.createElement('div');
   um.className='msg';
-  um.innerHTML=`<div>${msg.replace(/\n/g,'<br>')}</div><div class="msg-t">${getTime()}</div>`;
+  um.innerHTML=`<div>${sanitize(msg).replace(/\n/g,'<br>')}</div><div class="msg-t">${getTime()}</div>`;
   msgs.appendChild(um);
 
   const typing=document.createElement('div');
@@ -63,20 +63,39 @@ ${chatHist.slice(-8).map(h=>`${h.r==='user'?'User':'Coach'}: ${h.c}`).join('\n')
 User: ${msg}
 Coach:`;
 
+  typing.remove();
+
+  const am=document.createElement('div');
+  am.className='msg ai';
+  const amBody=document.createElement('div');
+  am.appendChild(amBody);
+  const amTime=document.createElement('div');
+  amTime.className='msg-t';
+  amTime.textContent=getTime();
+  am.appendChild(amTime);
+  msgs.appendChild(am);
+  msgs.scrollTop=msgs.scrollHeight;
+
+  let fullResponse='';
+
   try {
-    const response=await callAPI(ctx);
-    chatHist.push({r:'ai',c:response});
-    typing.remove();
-    const am=document.createElement('div');
-    am.className='msg ai';
-    am.innerHTML=`<div>${response.replace(/\n/g,'<br>')}</div><div class="msg-t">${getTime()}</div>`;
-    msgs.appendChild(am);
+    await callAPIStream(ctx, 
+      (chunk) => {
+        fullResponse += chunk;
+        amBody.innerHTML = sanitize(fullResponse).replace(/\n/g, '<br>');
+        msgs.scrollTop = msgs.scrollHeight;
+      },
+      () => {
+        chatHist.push({r:'ai',c:fullResponse});
+      },
+      (e) => {
+        console.error('[coach] stream error:', e);
+        amBody.innerHTML = `<span style="color:var(--accent2)">⚠️ Connection error: ${e.message}</span>`;
+      }
+    );
   } catch(e) {
-    typing.remove();
-    const em=document.createElement('div');
-    em.className='msg ai';
-    em.innerHTML=`<div style="color:var(--accent2)">⚠️ OpenAI connection failed. Check your API key in the header bar.</div>`;
-    msgs.appendChild(em);
+    console.error('[coach] sendChat:', e);
+    amBody.innerHTML = `<span style="color:var(--accent2)">⚠️ OpenAI connection failed. Check your API key in the header bar.</span>`;
   }
   msgs.scrollTop=msgs.scrollHeight;
 }

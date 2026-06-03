@@ -42,6 +42,31 @@ export default async function handler(req, res) {
       body: JSON.stringify(body)
     });
 
+    if (!upstream.ok) {
+      const errorText = await upstream.text();
+      return res.status(upstream.status).json({ error: { message: errorText } });
+    }
+
+    if (body.stream) {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('Content-Encoding', 'none'); // Disable compression buffering if any
+
+      if (upstream.body.pipe) {
+        upstream.body.pipe(res);
+      } else {
+        const reader = upstream.body.getReader();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          res.write(value);
+        }
+        res.end();
+      }
+      return;
+    }
+
     const data = await upstream.json();
     return res.status(upstream.status).json(data);
   } catch (err) {

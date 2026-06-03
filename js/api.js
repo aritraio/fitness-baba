@@ -52,6 +52,57 @@ async function callAPI(prompt) {
   return d.choices?.[0]?.message?.content ?? '';
 }
 
+async function callAPIStream(prompt, onChunk, onDone, onError) {
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: AI_MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 2048,
+        stream: true
+      })
+    });
+    if (!res.ok) throw new Error(await parseAIError(res));
+    
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        const cleaned = line.trim();
+        if (!cleaned) continue;
+        if (cleaned === 'data: [DONE]') {
+          continue;
+        }
+        if (cleaned.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(cleaned.slice(6));
+            const content = data.choices?.[0]?.delta?.content ?? '';
+            if (content) onChunk(content);
+          } catch (e) {
+            // Ignore syntax/JSON errors on broken chunks
+          }
+        }
+      }
+    }
+    if (onDone) onDone();
+  } catch (err) {
+    if (onError) onError(err);
+    else console.error('[callAPIStream]', err);
+  }
+}
+
 async function callVisionAPI(prompt, b64) {
   /* Vision needs a model that supports image input */
   const visionModel = AI_MODEL.includes('gpt-3.5')

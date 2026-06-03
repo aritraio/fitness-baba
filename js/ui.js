@@ -109,3 +109,20 @@ function copyCmd(el) {
     window.getSelection().addRange(range);
   });
 }
+
+/* ══════════════════════════════════════════════════════
+   SANITIZATION (XSS PROTECTION)
+   ══════════════════════════════════════════════════════ */
+function sanitize(html) {
+  if (typeof window.DOMPurify !== 'undefined') {
+    return window.DOMPurify.sanitize(html);
+  }
+  // Safe fallback if DOMPurify is not ready
+  return String(html)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+

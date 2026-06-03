@@ -4,6 +4,7 @@
 const TABS=[
   {id:'overview', lbl:'📊 Overview'},
   {id:'timeline', lbl:'🎯 Timeline'},
+  {id:'progress', lbl:'📈 Progress'},
   {id:'meals',    lbl:'🍽 Meals'},
   {id:'exercise', lbl:'💪 Exercise'},
   {id:'bodyscan', lbl:'🔬 Body Scan'},
@@ -27,7 +28,7 @@ function switchTab(id, btn) {
   btn.classList.add('active');
   document.getElementById(`p-${id}`).classList.add('active');
   btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  const fn={overview:tabOverview,timeline:tabTimeline,meals:tabMeals,exercise:tabExercise,
+  const fn={overview:tabOverview,timeline:tabTimeline,progress:tabProgress,meals:tabMeals,exercise:tabExercise,
     bodyscan:tabBodyScan,skincare:tabSkinCare,alerts:tabAlerts,cheat:tabCheat,coach:tabCoach};
   if(fn[id]) fn[id]();
 }
