@@ -1,4 +1,5 @@
 import { showNotif } from './ui.js';
+import { getAuthToken } from './auth.js';
 
 /* ══════════════════════════════════════════════════════
    AI MODEL SELECTOR
@@ -39,9 +40,13 @@ export async function parseAIError(res) {
    Same-origin call from browser → no CORS issue at all.
 ══════════════════════════════════════════════════════ */
 export async function callAPI(prompt) {
+  const token = await getAuthToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({
       model: AI_MODEL,
       messages: [{ role: 'user', content: prompt }],
@@ -56,9 +61,13 @@ export async function callAPI(prompt) {
 
 export async function callAPIStream(prompt, onChunk, onDone, onError) {
   try {
+    const token = await getAuthToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
     const res = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
         model: AI_MODEL,
         messages: [{ role: 'user', content: prompt }],
@@ -111,9 +120,13 @@ export async function callVisionAPI(prompt, b64) {
     ? 'openai/gpt-4o'
     : AI_MODEL;
 
+  const token = await getAuthToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({
       model: visionModel,
       messages: [{
