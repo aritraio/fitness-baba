@@ -51,10 +51,25 @@ export function updateProgressBar(cur) {
    OPT SELECT HELPER
    ══════════════════════════════════════════════════════ */
 export function bindOpts(wrap) {
-  wrap.querySelectorAll('.opt').forEach(o=>{
+  const opts = wrap.querySelectorAll('.opt');
+  wrap.setAttribute('role', 'radiogroup');
+  opts.forEach(o=>{
+    o.setAttribute('tabindex', '0');
+    o.setAttribute('role', 'radio');
+    o.setAttribute('aria-checked', o.classList.contains('selected') ? 'true' : 'false');
     o.addEventListener('click',()=>{
-      wrap.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected'));
+      opts.forEach(x=>{
+        x.classList.remove('selected');
+        x.setAttribute('aria-checked', 'false');
+      });
       o.classList.add('selected');
+      o.setAttribute('aria-checked', 'true');
+    });
+    o.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        o.click();
+      }
     });
   });
 }
@@ -76,6 +91,19 @@ export function goStep(n) {
     else if(n===4) step4(ob);
     else if(n===5) step5(ob);
     else if(n===6) step6(ob);
+    
+    // Focus management: focus the first form control or the card itself
+    const firstInput = ob.querySelector('input, select, textarea, [tabindex="0"]');
+    if (firstInput) {
+      firstInput.focus();
+    } else {
+      const card = ob.querySelector('.card');
+      if (card) {
+        card.setAttribute('tabindex', '-1');
+        card.focus();
+      }
+    }
+
     window.scrollTo({top:0,behavior:'smooth'});
   };
 
@@ -155,6 +183,32 @@ export function sanitize(html) {
     .replace(/'/g, '&#x27;');
 }
 
+export function initTheme() {
+  const saved = localStorage.getItem('theme');
+  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = saved || (systemPrefersDark ? 'dark' : 'light');
+  setTheme(theme);
+}
+
+export function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  const btn = document.getElementById('theme-toggle');
+  if (btn) {
+    btn.textContent = theme === 'light' ? '🌙' : '☀️';
+    btn.setAttribute('aria-label', theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode');
+  }
+  // If progress logs are available, force chart refresh to update colors
+  if (window.refreshLogs && document.getElementById('p-progress')?.classList.contains('active')) {
+    window.refreshLogs();
+  }
+}
+
+export function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  setTheme(next);
+}
 
 /* Expose to window for inline HTML handlers */
 window.showNotif = showNotif;
@@ -167,3 +221,6 @@ window.animBars = animBars;
 window.checkProtocol = checkProtocol;
 window.copyCmd = copyCmd;
 window.sanitize = sanitize;
+window.initTheme = initTheme;
+window.setTheme = setTheme;
+window.toggleTheme = toggleTheme;

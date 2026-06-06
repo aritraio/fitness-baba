@@ -19,9 +19,35 @@ export function tabMeals() {
         <strong style="color:var(--accent)">${d} kcal/day</strong> · P:${m.protein}g C:${m.carbs}g F:${m.fat}g<br>
         ${S.pantry.length?`<span style="color:var(--accent4)">Using: ${S.pantry.join(', ')}</span>`:'No pantry preferences'}
       </div>
-      <button class="btn" onclick="genMeals()">Generate My Meal Plan</button>
+      <div class="btn-row">
+        <button class="btn" onclick="genMeals()">Generate My Meal Plan</button>
+        <button class="btn btn-ghost" id="meals-export-btn" onclick="window.exportMealPlan()" style="display:none">Export PDF 📄</button>
+      </div>
     </div>
     <div id="meals-out"></div>`;
+
+  if (S.plans && S.plans.meals) {
+    renderMeals(S.plans.meals);
+  }
+}
+
+export function renderMeals(meals) {
+  const out = document.getElementById('meals-out');
+  if (!out) return;
+  out.innerHTML = meals.map(m => `
+    <div class="meal-card">
+      <div class="meal-hdr"><div><div class="meal-name">${sanitize(m.meal)}</div></div><div class="meal-time">${sanitize(m.time)}</div></div>
+      <div class="badges">
+        <span class="badge b-cal">🔥 ${sanitize(m.calories)} kcal</span>
+        <span class="badge b-pro">P: ${sanitize(m.protein)}g</span>
+        <span class="badge b-carb">C: ${sanitize(m.carbs)}g</span>
+        <span class="badge b-fat">F: ${sanitize(m.fat)}g</span>
+      </div>
+      <div class="meal-items">${Array.isArray(m.items) ? m.items.map(sanitize).join(' · ') : sanitize(m.items)}</div>
+      ${m.tip ? `<div class="meal-tip">${sanitize(m.tip)}</div>` : ''}
+    </div>`).join('');
+  const exportBtn = document.getElementById('meals-export-btn');
+  if (exportBtn) exportBtn.style.display = 'block';
 }
 
 export async function genMeals() {
@@ -35,22 +61,16 @@ Return ONLY a valid JSON array of exactly 4 meals:
 Make meals realistic and delicious. Total ~${d} kcal.`;
 
   const out=document.getElementById('meals-out');
+  const exportBtn = document.getElementById('meals-export-btn');
+  if (exportBtn) exportBtn.style.display = 'none';
   out.innerHTML=`<div class="loader"><div class="spinner"></div><div class="loader-txt">GENERATING YOUR MEAL PLAN...</div></div>`;
   try {
     const raw=await callAPI(prompt);
     const meals=parseArr(raw);
-    out.innerHTML=meals.map(m=>`
-      <div class="meal-card">
-        <div class="meal-hdr"><div><div class="meal-name">${m.meal}</div></div><div class="meal-time">${m.time}</div></div>
-        <div class="badges">
-          <span class="badge b-cal">🔥 ${m.calories} kcal</span>
-          <span class="badge b-pro">P: ${m.protein}g</span>
-          <span class="badge b-carb">C: ${m.carbs}g</span>
-          <span class="badge b-fat">F: ${m.fat}g</span>
-        </div>
-        <div class="meal-items">${Array.isArray(m.items)?m.items.join(' · '):m.items}</div>
-        ${m.tip?`<div class="meal-tip">${m.tip}</div>`:''}
-      </div>`).join('');
+    S.plans = S.plans || {};
+    S.plans.meals = meals;
+    renderMeals(meals);
+    await saveProfile();
   } catch(e) {
     out.innerHTML=`<div class="err-card"><p>⚠️ Could not generate meal plan. Check your OpenAI API key in the header.<br><br><small>${e.message}</small></p><button class="btn btn-red btn-sm" onclick="genMeals()">Retry</button></div>`;
   }
@@ -59,3 +79,4 @@ Make meals realistic and delicious. Total ~${d} kcal.`;
 /* Expose to window for inline HTML handlers */
 window.tabMeals = tabMeals;
 window.genMeals = genMeals;
+window.renderMeals = renderMeals;

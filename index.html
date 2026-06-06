@@ -21,6 +21,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
   <!-- Chart.js (Progress tracking) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- html2canvas (Export/Share) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- jsPDF (PDF export) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -54,27 +58,40 @@
     <div class="hdr-top">
       <div>
         <div class="logo-tag">Personal Health Engine v3.0</div>
-        <h1 class="app-title">FitnessBaba</h1>
-        <p class="tagline">// your personal health coach — biomarkers to kitchen in 60s</p>
+        <h1 class="app-title" data-i18n="title">FitnessBaba</h1>
+        <p class="tagline" data-i18n="tagline">// your personal health coach — biomarkers to kitchen in 60s</p>
       </div>
-      <!-- Clerk UserButton mounts here after sign-in -->
-      <div id="user-btn-slot"></div>
+      <!-- Theme toggle and Clerk UserButton slot -->
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme" onclick="toggleTheme()">☀️</button>
+        <div id="user-btn-slot"></div>
+      </div>
     </div>
     <div class="key-bar">
-      <div class="key-row">
-        <span class="key-icon">✦</span>
-        <span class="key-label">Model</span>
-        <select id="model-sel" onchange="setModel(this.value)" title="AI model via ZenMux">
-          <option value="openai/gpt-4o" selected>GPT-4o</option>
-          <option value="openai/gpt-4o-mini">GPT-4o mini</option>
-          <option value="anthropic/claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
-          <option value="anthropic/claude-3-5-haiku-20241022">Claude 3.5 Haiku</option>
-          <option value="google/gemini-2.0-flash">Gemini 2.0 Flash</option>
-          <option value="google/gemini-1.5-pro">Gemini 1.5 Pro</option>
-        </select>
-        <span class="key-powered">via ZenMux</span>
+      <div class="key-row" style="flex-wrap: wrap; gap: 12px; display: flex; align-items: center;">
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span class="key-icon">✦</span>
+          <span class="key-label" data-i18n="model">Model</span>
+          <select id="model-sel" onchange="setModel(this.value)" title="AI model via ZenMux" aria-label="Select AI Model">
+            <option value="openai/gpt-4o" selected>GPT-4o</option>
+            <option value="openai/gpt-4o-mini">GPT-4o mini</option>
+            <option value="anthropic/claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+            <option value="anthropic/claude-3-5-haiku-20241022">Claude 3.5 Haiku</option>
+            <option value="google/gemini-2.0-flash">Gemini 2.0 Flash</option>
+            <option value="google/gemini-1.5-pro">Gemini 1.5 Pro</option>
+          </select>
+          <span class="key-powered" data-i18n="power">via ZenMux</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span class="key-icon">🌐</span>
+          <span class="key-label" data-i18n="lang">Language</span>
+          <select id="lang-sel" onchange="setLang(this.value)" title="Choose Language" aria-label="Select Language">
+            <option value="en" selected>English</option>
+            <option value="hi">Hinglish</option>
+          </select>
+        </div>
       </div>
-      <div class="key-hint">
+      <div class="key-hint" data-i18n="model_hint">
         94 models · OpenAI · Anthropic · Google ·
         <a href="https://zenmux.ai/models" target="_blank" rel="noopener">zenmux.ai/models →</a>
       </div>

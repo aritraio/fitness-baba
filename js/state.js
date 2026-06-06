@@ -12,6 +12,8 @@ export const S = {
 
   // Dynamic runtime variables migrated inside S for ESM mutable bindings
   step: 1,
+  lang: 'en',
+  plans: { meals: null, workout: null },
   remLoop: null,
   waterLoop: null,
   chatHist: [],

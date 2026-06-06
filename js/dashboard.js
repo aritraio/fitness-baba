@@ -8,36 +8,51 @@ import { tabAlerts } from './alerts.js';
 import { tabCheat } from './cheat.js';
 import { tabCoach } from './coach.js';
 import { tabProgress } from './progress.js';
+import { t } from './i18n.js';
 
 /* ══════════════════════════════════════════════════════
    DASHBOARD BUILDER
-══════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════ */
 const TABS=[
-  {id:'overview', lbl:'📊 Overview'},
-  {id:'timeline', lbl:'🎯 Timeline'},
-  {id:'progress', lbl:'📈 Progress'},
-  {id:'meals',    lbl:'🍽 Meals'},
-  {id:'exercise', lbl:'💪 Exercise'},
-  {id:'bodyscan', lbl:'🔬 Body Scan'},
-  {id:'skincare', lbl:'✨ Skin Care'},
-  {id:'alerts',   lbl:'🔔 Alerts'},
-  {id:'cheat',    lbl:'🍕 Cheat Meal'},
-  {id:'coach',    lbl:'🤖 AI Coach'},
+  {id:'overview', lblKey:'tab_overview'},
+  {id:'timeline', lblKey:'tab_timeline'},
+  {id:'progress', lblKey:'tab_progress'},
+  {id:'meals',    lblKey:'tab_meals'},
+  {id:'exercise', lblKey:'tab_exercise'},
+  {id:'bodyscan', lblKey:'tab_bodyscan'},
+  {id:'skincare', lblKey:'tab_skincare'},
+  {id:'alerts',   lblKey:'tab_alerts'},
+  {id:'cheat',    lblKey:'tab_cheat'},
+  {id:'coach',    lblKey:'tab_coach'},
 ];
 
 export function buildDashboard() {
-  document.getElementById('tab-bar').innerHTML=
-    TABS.map((t,i)=>`<button class="tab-btn${i===0?' active':''}" onclick="switchTab('${t.id}',this)">${t.lbl}</button>`).join('');
+  const tabBar = document.getElementById('tab-bar');
+  tabBar.setAttribute('role', 'tablist');
+  tabBar.setAttribute('aria-label', 'Dashboard Tabs');
+  
+  tabBar.innerHTML=
+    TABS.map((tTab,i)=>`<button id="tab-${tTab.id}" role="tab" aria-selected="${i===0?'true':'false'}" aria-controls="p-${tTab.id}" class="tab-btn${i===0?' active':''}" onclick="switchTab('${tTab.id}',this)">${t(tTab.lblKey)}</button>`).join('');
+  
   document.getElementById('tab-content').innerHTML=
-    TABS.map((t,i)=>`<div class="tab-panel${i===0?' active':''}" id="p-${t.id}"></div>`).join('');
+    TABS.map((tTab,i)=>`<div role="tabpanel" id="p-${tTab.id}" aria-labelledby="tab-${tTab.id}" class="tab-panel${i===0?' active':''}"></div>`).join('');
+  
   tabOverview();
 }
 
 export function switchTab(id, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  
   btn.classList.add('active');
-  document.getElementById(`p-${id}`).classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+  
+  const panel = document.getElementById(`p-${id}`);
+  if (panel) panel.classList.add('active');
+  
   btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
   const fn={overview:tabOverview,timeline:tabTimeline,progress:tabProgress,meals:tabMeals,exercise:tabExercise,
     bodyscan:tabBodyScan,skincare:tabSkinCare,alerts:tabAlerts,cheat:tabCheat,coach:tabCoach};

@@ -753,3 +753,109 @@ video.scan-vid{
   transform: translateY(-14px);
 }
 
+/* ═══════════════════════════════════════════
+   LIGHT THEME OVERRIDES
+   ═══════════════════════════════════════════ */
+:root[data-theme="light"] {
+  --bg: #f5f7f8;
+  --surface: #ffffff;
+  --surface2: #eef2f5;
+  --surface3: #e2e8f0;
+  --border: #d1d5db;
+  --accent: #00b89a;
+  --accent2: #e11d48;
+  --accent3: #d97706;
+  --accent4: #6d28d9;
+  --text: #0f172a;
+  --muted: #475569;
+}
+:root[data-theme="light"] body {
+  background-image:
+    radial-gradient(ellipse at 15% 0%,rgba(0,229,192,.04) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 95%,rgba(167,139,250,.03) 0%,transparent 55%),
+    url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='.6' fill='%23cbd5e1' fill-opacity='.6'/%3E%3C/svg%3E");
+}
+:root[data-theme="light"] body::after {
+  background: repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,.03) 3px,rgba(255,255,255,.03) 4px);
+}
+:root[data-theme="light"] header {
+  background: rgba(245,247,248,.96);
+}
+:root[data-theme="light"] .tab-bar {
+  background: rgba(245,247,248,.96);
+}
+:root[data-theme="light"] select,
+:root[data-theme="light"] input,
+:root[data-theme="light"] textarea {
+  background: #ffffff;
+  color: #0f172a;
+}
+:root[data-theme="light"] .opt {
+  background: #ffffff;
+}
+:root[data-theme="light"] .opt:hover {
+  background: #f1f5f9;
+}
+:root[data-theme="light"] .opt.selected {
+  background: rgba(0,184,154,.08);
+}
+:root[data-theme="light"] .ex-check {
+  background: #ffffff;
+}
+:root[data-theme="light"] .ex-check:checked {
+  background: var(--accent);
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+:root[data-theme="light"] .btn {
+  color: #ffffff;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  color: var(--text);
+  padding: 0;
+  line-height: 1;
+}
+.theme-toggle-btn:hover {
+  border-color: var(--accent);
+  background: var(--surface3);
+  transform: scale(1.05);
+}
+
+/* ═══════════════════════════════════════════
+   ACCESSIBILITY (a11y)
+   ═══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+  #bmi-needle {
+    transition: none !important;
+  }
+  .macro-fill {
+    transition: none !important;
+  }
+  .m-fill {
+    transition: none !important;
+  }
+  .card {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+

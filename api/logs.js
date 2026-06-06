@@ -56,7 +56,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     const { data, error } = await supabase
       .from('daily_logs')
-      .select('log_date, weight, calories, water_ml, notes')
+      .select('log_date, weight, calories, water_ml, notes, workout')
       .eq('user_id', userId)
       .order('log_date', { ascending: false })
       .limit(30);
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
 
   /* ── POST — upsert log entry ────────────────────────────── */
   if (req.method === 'POST') {
-    const { log_date, weight, calories, water_ml, notes } = req.body ?? {};
+    const { log_date, weight, calories, water_ml, notes, workout } = req.body ?? {};
     if (!log_date) return err(res, 400, 'Missing log_date in body');
 
     const updateObj = {
@@ -80,6 +80,7 @@ export default async function handler(req, res) {
     if (calories !== undefined && calories !== null && calories !== '') updateObj.calories = parseInt(calories, 10);
     if (water_ml !== undefined && water_ml !== null && water_ml !== '') updateObj.water_ml = parseInt(water_ml, 10);
     if (notes !== undefined) updateObj.notes = notes;
+    if (workout !== undefined) updateObj.workout = workout;
 
     const { error } = await supabase
       .from('daily_logs')

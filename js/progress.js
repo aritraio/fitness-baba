@@ -47,10 +47,13 @@ export async function tabProgress() {
       </form>
     </div>
 
-    <div class="card" style="margin: 0 0 14px">
+    <div class="card" id="progress-trend-card" style="margin: 0 0 14px">
       <div class="sec-hdr">
-        <div class="sec-title">Weight Trend</div>
-        <div class="sec-sub">last 30 logged entries</div>
+        <div>
+          <div class="sec-title">Weight Trend</div>
+          <div class="sec-sub">last 30 logged entries</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="window.exportProgressTrend()" style="width:auto; margin:0; padding:6px 12px; font-size:10px;">Share Trend 🖼️</button>
       </div>
       <div style="position: relative; width: 100%; height: 220px;">
         <canvas id="weightChart"></canvas>
