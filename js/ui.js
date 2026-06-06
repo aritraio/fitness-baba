@@ -23,18 +23,33 @@ export function fireN(title, body) {
 ══════════════════════════════════════════════════════ */
 export function renderDots(cur) {
   const c = document.getElementById('dots');
-  c.style.display = cur > STEPS ? 'none' : 'flex';
-  c.innerHTML = '';
-  for(let i=1;i<=STEPS;i++){
-    const d=document.createElement('div');
-    d.className='dot'+(i<cur?' done':i===cur?' active':'');
-    c.appendChild(d);
+  if (c) {
+    c.style.display = cur > STEPS ? 'none' : 'flex';
+    c.innerHTML = '';
+    for(let i=1;i<=STEPS;i++){
+      const d=document.createElement('div');
+      d.className='dot'+(i<cur?' done':i===cur?' active':'');
+      c.appendChild(d);
+    }
+  }
+  updateProgressBar(cur);
+}
+
+export function updateProgressBar(cur) {
+  const wrap = document.getElementById('progress-bar-wrap');
+  const bar = document.getElementById('progress-bar');
+  if (!wrap || !bar) return;
+
+  wrap.style.display = cur > STEPS ? 'none' : 'block';
+  if (cur <= STEPS) {
+    const pct = ((cur - 1) / (STEPS - 1)) * 100;
+    bar.style.width = `${pct}%`;
   }
 }
 
 /* ══════════════════════════════════════════════════════
    OPT SELECT HELPER
-══════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════ */
 export function bindOpts(wrap) {
   wrap.querySelectorAll('.opt').forEach(o=>{
     o.addEventListener('click',()=>{
@@ -46,19 +61,30 @@ export function bindOpts(wrap) {
 
 /* ══════════════════════════════════════════════════════
    ONBOARDING ROUTER
-══════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════ */
 export function goStep(n) {
-  S.step = n;
-  renderDots(n);
   const ob = document.getElementById('onboarding');
-  ob.innerHTML='';
-  if(n===1) step1(ob);
-  else if(n===2) step2(ob);
-  else if(n===3) step3(ob);
-  else if(n===4) step4(ob);
-  else if(n===5) step5(ob);
-  else if(n===6) step6(ob);
-  window.scrollTo({top:0,behavior:'smooth'});
+  const existingCard = ob.querySelector('.card');
+
+  const renderNext = () => {
+    S.step = n;
+    renderDots(n);
+    ob.innerHTML = '';
+    if(n===1) step1(ob);
+    else if(n===2) step2(ob);
+    else if(n===3) step3(ob);
+    else if(n===4) step4(ob);
+    else if(n===5) step5(ob);
+    else if(n===6) step6(ob);
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  if (existingCard) {
+    existingCard.classList.add('fade-out');
+    setTimeout(renderNext, 200);
+  } else {
+    renderNext();
+  }
 }
 
 /* ══════════════════════════════════════════════════════

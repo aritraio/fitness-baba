@@ -125,8 +125,8 @@ test('Macro split for calorie deficit', () => {
 ### 12. Dark/Light Theme Toggle
 - Add a theme toggle respecting `prefers-color-scheme`. CSS custom properties are already in use.
 
-### 13. Onboarding Validation & UX Polish
-- Inline validation messages, bounds checking, animated step transitions, and a progress bar.
+### 13. Onboarding Validation & UX Polish [DONE]
+- **Status: Completed** — Added inline error validation warnings, dynamic bounds checking, animated step card transitions, and a page-top visual progress bar.
 
 ### 14. Workout Completion Tracking
 - Wire up the existing exercise checkboxes to persist completion state to Supabase.
