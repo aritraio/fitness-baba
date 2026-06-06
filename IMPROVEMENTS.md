@@ -6,7 +6,8 @@
 
 ## 🏆 Tier 1 — High-Impact Resume Differentiators
 
-### 1. Progress Tracking Dashboard with Charts
+### 1. Progress Tracking Dashboard with Charts [DONE]
+- **Status: Completed** — Configured dynamic daily logging, created schema tables inside `supabase/schema_logs.sql`, established `/api/logs` CRUD endpoints, and built weight trend dashboards using `Chart.js`.
 - **What**: Track weight, calories, and workouts over time. Store daily logs in Supabase and render trend charts using [Chart.js](https://www.chartjs.org/).
 - **Why**: The app is currently stateless per session — every AI plan is generated fresh and forgotten. A progress tracker shows understanding of **data modelling, time-series storage, and data visualization**.
 - **Complexity**: Medium
@@ -29,7 +30,8 @@ CREATE TABLE daily_logs (
 
 ---
 
-### 2. Streaming AI Responses (SSE)
+### 2. Streaming AI Responses (SSE) [DONE]
+- **Status: Completed** — Built SSE streaming headers inside serverless router `/api/chat`, implemented chunk parsing in `js/api.js`, and rendered incremental tokens in real-time in the coach tab.
 - **What**: Stream tokens as they arrive using **Server-Sent Events** instead of waiting 5–15s for a blank spinner.
 - **Why**: Demonstrates knowledge of **streaming protocols, chunked transfer encoding**, and real-time UX — hot topics in AI engineering.
 - **Complexity**: Medium
@@ -37,7 +39,8 @@ CREATE TABLE daily_logs (
 
 ---
 
-### 3. PWA (Progressive Web App) Support
+### 3. PWA (Progressive Web App) Support [DONE]
+- **Status: Completed** — Registered service worker in `js/main.js` with assets caching in `sw.js` and defined visual launcher behaviors in `manifest.json`.
 - **What**: Add `manifest.json`, a service worker for offline caching, and an install prompt. Make the app installable on phones.
 - **Why**: A fitness app on the home screen is **10x more impressive** in a demo. Shows understanding of the **app lifecycle, caching strategies, and mobile-first thinking**.
 - **Complexity**: Low–Medium
@@ -53,14 +56,16 @@ CREATE TABLE daily_logs (
 
 ## 🔧 Tier 2 — Engineering Quality
 
-### 5. Migrate to ES Modules
+### 5. Migrate to ES Modules [DONE]
+- **Status: Completed** — Migrated script tags in `index.html` to a single modular entrypoint and transitioned internal helper functions to export/import modular files.
 - **What**: Replace 18 global `<script>` tags with `import`/`export` + a bundler like Vite.
 - **Why**: Global scope pollution is the #1 code smell a reviewer would notice. ES modules show understanding of **modern JS tooling and dependency graphs**.
 - **Complexity**: Medium
 
 ---
 
-### 6. Input Sanitization & XSS Protection
+### 6. Input Sanitization & XSS Protection [DONE]
+- **Status: Completed** — Added DOMPurify parser link inside header metadata and created generic `sanitize()` wrappers in `js/ui.js` used before injecting user/AI inputs into the DOM.
 - **What**: The coach chat and other tabs inject user/AI text via `.innerHTML` with no escaping. Create a `sanitize()` helper and apply everywhere.
 - **Why**: Security awareness is a **must-have** signal. Finding and fixing your own XSS shows maturity.
 - **Complexity**: Low
@@ -80,7 +85,8 @@ um.innerHTML = `<div>${sanitize(msg).replace(/\n/g,'<br>')}</div>`;
 
 ---
 
-### 7. Unit Tests
+### 7. Unit Tests [DONE]
+- **Status: Completed** — Added pure computation assertions in `js/calc.test.js` and serverless endpoint mocks inside `api/chat.test.js` using Vitest test suites.
 - **What**: Add tests for `calc.js` (BMI/BMR/TDEE/macros) and integration tests for the API proxy using Vitest or Jest.
 - **Why**: The calc functions are pure and stateless — perfect test targets. Shows you care about **correctness and regression prevention**.
 - **Complexity**: Low
@@ -100,7 +106,8 @@ test('Macro split for calorie deficit', () => {
 
 ---
 
-### 8. Rate Limiting on API Proxy
+### 8. Rate Limiting on API Proxy [DONE]
+- **Status: Completed** — Set up `rate_limits` table inside `supabase/schema_rate_limits.sql` and restricted chat API traffic per-user/IP with sliding-window rules inside proxy endpoints.
 - **What**: `api/chat.js` is wide open — anyone can spam it and burn API credits. Add per-user rate limiting via Clerk user ID or IP.
 - **Why**: Shows thinking about **cost management, API security, and production ops**.
 - **Complexity**: Low
@@ -135,14 +142,14 @@ test('Macro split for calorie deficit', () => {
 
 ## 📋 Priority Action Plan
 
-| # | Improvement | Time | Resume Impact |
-|---|-------------|------|---------------|
-| 1 | Progress Tracking + Charts | 2–3 days | ⭐⭐⭐⭐⭐ |
-| 2 | Streaming AI Responses (SSE) | 1 day | ⭐⭐⭐⭐ |
-| 3 | Unit Tests for `calc.js` | 2–3 hours | ⭐⭐⭐⭐ |
-| 4 | XSS Fix + Sanitization | 1–2 hours | ⭐⭐⭐ |
-| 5 | PWA Support | 1 day | ⭐⭐⭐ |
-| 6 | ES Modules Migration | 1–2 days | ⭐⭐⭐ |
+| # | Improvement | Time | Resume Impact | Status |
+|---|-------------|------|---------------|--------|
+| 1 | Progress Tracking + Charts | 2–3 days | ⭐⭐⭐⭐⭐ | Completed ✅ |
+| 2 | Streaming AI Responses (SSE) | 1 day | ⭐⭐⭐⭐ | Completed ✅ |
+| 3 | Unit Tests for `calc.js` | 2–3 hours | ⭐⭐⭐⭐ | Completed ✅ |
+| 4 | XSS Fix + Sanitization | 1–2 hours | ⭐⭐⭐ | Completed ✅ |
+| 5 | PWA Support | 1 day | ⭐⭐⭐ | Completed ✅ |
+| 6 | ES Modules Migration | 1–2 days | ⭐⭐⭐ | Completed ✅ |
 
 > **After these 6 improvements, your resume bullet becomes:**
 >
